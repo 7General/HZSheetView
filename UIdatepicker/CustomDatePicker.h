@@ -18,7 +18,6 @@
 /**设置行数数量*/
 -(NSInteger)CpickerView:(UIPickerView *)pickerView numberOfRowsInPicker:(NSInteger)component;
 
-
 @optional
 /**设置每行的显示富文本字体*/
 - (NSAttributedString *)CpickerView:(UIPickerView *)pickerView attributedTitleForRowTtile:(NSInteger)row forComponent:(NSInteger)component;
@@ -29,13 +28,16 @@
 
 
 @protocol CustomDatePickerDelegate <NSObject>
+@optional
 
 /**设置每行高度*/
--(CGFloat)CpickerView:(UIPickerView *)pickerView rowHeightForPicker:(NSInteger)component;
+-(CGFloat)CpickerView:(nullable UIPickerView *)pickerView rowHeightForPicker:(NSInteger)component;
 
--(void)CpickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component;
+-(void)CpickerView:(nullable UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component;
 
 -(void)CpickerViewdidSelectRow:(NSInteger)row;
+
+-(void)CpickerViewCancleClick;
 @end
 
 
@@ -43,8 +45,8 @@
 
 
 
-@property (nonatomic, weak) id<CustomDatePickerDataSource>  dataSource;
-@property (nonatomic, weak) id<CustomDatePickerDelegate>  delegate;
+@property (nonatomic, weak) id <CustomDatePickerDataSource>  dataSource;
+@property (nonatomic, weak) id <CustomDatePickerDelegate>  delegate;
 
 
 

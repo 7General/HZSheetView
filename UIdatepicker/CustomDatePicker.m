@@ -29,6 +29,7 @@
 
 @property (nonatomic, assign) NSInteger  selectIndex;
 
+
 @end
 
 @implementation CustomDatePicker
@@ -56,10 +57,6 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismisView)];
     [self addGestureRecognizer:tap];
     
-    
-    
-    
-    
 }
 
 -(void)dismisView {
@@ -73,12 +70,7 @@
 
 -(void)setDataSource:(id<CustomDatePickerDataSource>)dataSource {
     _dataSource = dataSource;
-    UIPickerView * pickView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, DDMWIDTH, SHEETHEIGHT)];
-    pickView.backgroundColor = DDMColor(245, 245,245);
-    pickView.delegate = self;
-    pickView.dataSource = self;
-    [self.mainView addSubview:pickView];
-    self.pickView = pickView;
+    
     
     UIView * topConsole = [[UIView alloc] initWithFrame:CGRectMake(0, 0, DDMWIDTH, 46)];
     topConsole.backgroundColor = DDMColor(255, 255, 255);
@@ -89,8 +81,8 @@
     [cancleBtn setTitle:self.sureBtnTitle forState:UIControlStateNormal];
     [cancleBtn setTitleColor:DDMColor(80, 80, 80) forState:UIControlStateNormal];
     cancleBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-    [cancleBtn addTarget:self action:@selector(CancleBtnClick) forControlEvents:UIControlEventTouchUpInside];
     cancleBtn.frame = CGRectMake(18, 0, 38, 46);
+    [cancleBtn addTarget:self action:@selector(CancleBtnClick) forControlEvents:UIControlEventTouchUpInside];
     [topConsole addSubview:cancleBtn];
     
     
@@ -101,9 +93,19 @@
     sureBtn.frame = CGRectMake(DDMWIDTH - 18 - 38, 0, 38, 46);
     [sureBtn addTarget:self action:@selector(SureBtnClick) forControlEvents:UIControlEventTouchUpInside];
     [topConsole addSubview:sureBtn];
+    
+    UIPickerView * pickView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topConsole.frame), DDMWIDTH, SHEETHEIGHT - 46)];
+    pickView.backgroundColor = DDMColor(245, 245,245);
+    pickView.delegate = self;
+    pickView.dataSource = self;
+    [self.mainView addSubview:pickView];
+    self.pickView = pickView;
 }
 /**取消*/
 -(void)CancleBtnClick {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(CpickerViewCancleClick)]) {
+        [self.delegate CpickerViewCancleClick];
+    }
     [self dismisView];
 }
 /**确定*/
@@ -115,10 +117,11 @@
 }
 
 
+
 - (void)show {
     [UIView animateWithDuration:0.25 animations:^{
         self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
-        CGRect rect = CGRectMake(0, DDMHEIGHT - SHEETHEIGHT, DDMWIDTH, SHEETHEIGHT);
+        CGRect rect = CGRectMake(0, DDMHEIGHT - SHEETHEIGHT + 10, DDMWIDTH, SHEETHEIGHT);
         self.mainView.frame = rect;
     }];
 }
@@ -142,14 +145,13 @@
         return 0;
     }
 }
-//- (NSAttributedString *)pickerView:(UIPickerView *)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component{
-//    NSAttributedString * attribStr = nil;
-//    if (self.dataSource && [self.dataSource respondsToSelector:@selector(CpickerView:attributedTitleForRowTtile:forComponent:)]) {
-//        attribStr = [self.dataSource CpickerView:pickerView attributedTitleForRowTtile:row forComponent:component];
-//    }
-//    return  attribStr;
-//}
-
+- (NSAttributedString *)pickerView:(UIPickerView *)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component{
+    NSAttributedString * attribStr = nil;
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(CpickerView:attributedTitleForRowTtile:forComponent:)]) {
+        attribStr = [self.dataSource CpickerView:pickerView attributedTitleForRowTtile:row forComponent:component];
+    }
+    return  attribStr;
+}
 
 - (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(nullable UIView *)view {
     UIView * resView = [[UIView alloc] init];
@@ -160,8 +162,12 @@
 }
 
 
-
-
+-(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    self.selectIndex = row;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(CpickerView:didSelectRow:inComponent:)]) {
+        [self.delegate CpickerView:pickerView didSelectRow:row inComponent:component];
+    }
+}
 
 -(CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
     if (self.delegate && [self.delegate respondsToSelector:@selector(CpickerView:rowHeightForPicker:)]) {
